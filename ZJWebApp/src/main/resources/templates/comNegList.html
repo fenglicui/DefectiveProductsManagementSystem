@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <title>企业信息清单</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+    <style type="text/css">
+        .wrapper {
+            margin-top: 60px;
+        }
+
+        .redTd {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+<div class="container wrapper">
+
+    <!--<div class="container"><a href="/com?sort=1"><button type="button" class="btn btn-info">按照通过率降序排列</button></a>-->
+    <!--<a href="/com?sort=2"><button type="button" class="btn btn-info">按照通过率升序排列</button></a>-->
+    <!--<a href="/com?sort=4"><button type="button" class="btn btn-info">按照案例数降序排列</button></a>-->
+    <!--<a href="/com?sort=3"><button type="button" class="btn btn-info">按照案例数升序排列</button></a>-->
+    <!--</div>-->
+    <div>
+        <h2 class="title" style="text-align: center">企业信息</h2>
+        <div class="container"><a href="/chart/comChart" target="_blank">
+            <button type="button" class="btn btn-primary">查看统计图表</button>
+        </a></div>
+        <form id="form" action="/com" th:object="${companyForm}" method="get" class="form-horizontal">
+            <div class="form-group">
+                <label for="factory" class="col-md-2" style="text-align: right; margin-top: 7px">企业名称</label>
+                <div class="col-md-2">
+                    <input class="form-control" type="text" id="factory" th:value="*{factory}" name="factory"/>
+                </div>
+
+                <label for="province" class="col-md-2" style="text-align: right; margin-top: 7px">企业所在省份</label>
+                <div class="col-md-2">
+                    <input class="form-control" type="text" id="province" th:value="*{province}" name="province"/>
+                </div>
+
+                <label for="sort" class="col-md-2" style="text-align: right; margin-top: 7px">排序方式</label>
+                <div class="col-md-2">
+                    <select class="form-control" th:value="*{sort}" name="sort" id="sort">
+                        <option value="0" th:selected="${companyForm.sort==0}">按照不合格率降序</option>
+                        <option value="1" th:selected="${companyForm.sort==1}">按照召回数降序</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-5 col-md-2">
+                    <input class="btn btn-primary" type="submit" value="搜索"/>
+                </div>
+            </div>
+
+            <table class="table table-hover table-bordered table-striped">
+                <tr>
+                    <th>企业名称</th>
+                    <th>所在省份</th>
+                    <th style="text-align: center" >企业基本信息</th>
+                    <th style="text-align: center" >在案例库中搜索</th>
+                    <th style="text-align: center" >召回次数</th>
+                    <th style="text-align: center" >召回信息</th>
+                    <th style="text-align: center" >抽检次数</th>
+                    <th style="text-align: center" >抽检不合格率</th>
+
+                </tr>
+                <tr th:each="i : ${pnl.content}"
+                    th:if="${i.companyName}!=null and ${#strings.length(i.companyName)} gt 2">
+                    <td><a th:href="@{'/com/detail?name='+${i.companyName} }" target="_blank"><span
+                            th:text="${i.companyName}">name</span></a>
+                    </td>
+                    <td th:text="${i.province}">江苏</td>
+                    <td style="text-align: center" ><a target="_blank" th:href="'http://www.xizhi.com/search?wd='+${i.companyName}"><span
+                            class="label label-success">基本信息</span></a></td>
+                    <td style="text-align: center" ><a target="_blank" th:href="@{'/search?queryWord='} + ${i.companyName}"><span
+                            class="label label-success">搜索</span></a>
+                    </td>
+
+                    <td style="text-align: center" ><span th:text="${i.callbackNum}">0</span></td>
+                    <td style="text-align: center" ><a th:href="@{'/com/callbackDetail?companyName='+${i.companyName }} "
+                           th:if="${i.callbackNum>0}" target="_blank">详细信息</a></td>
+                    <td style="text-align: center" th:text="${i.caseNum}">1</td>
+                    <td style="text-align: center" th:text="${i.passPercent eq 1 ? 0 : (#numbers.formatInteger((1.0 - i.passPercent)*100,2) +'%') }">
+                        1
+                    </td>
+                </tr>
+            </table>
+            <div class="container paging">
+                <!--分页组件-->
+                <nav aria-label="Page navigation" th:object="${pnl}">
+                    <ul class="pagination">
+                        <li class="page-item disabled">
+                            <span>共<span th:text="${pnl.totalPages}">1</span>页</span>
+                        </li>
+                        <!--当前页-->
+                        <li class="page-item disabled">
+                            <span th:inline="text">当前页码：[[${pnl.number}+1]]</span>
+                        </li>
+                        <!--前往-->
+                        <li class="page-item">
+                            输入页码：<input id="page" type="text" name="page" th:value="${companyForm.page}"/>
+                            <input type="submit" value="前往"/>
+                        </li>
+                        <!--上一页-->
+                        <li class="page-item" th:classappend="${pnl.isFirst()} ? 'disabled' : ''">
+                            <a id="prev" class="page-link" aria-label="Previous">
+                                <span aria-hidden="true">←</span>
+                            </a>
+                        </li>
+
+                        <!--下一页-->
+                        <li class="page-item" th:classappend="${pnl.isLast()} ? 'disabled' : ''">
+                            <a id="next" class="page-link" aria-label="Next">
+                                <span aria-hidden="true">→</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </form>
+    </div>
+
+
+</div>
+
+<div th:replace="fragments/float-footer :: footer">...</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script charset="uft-8" th:inline='javascript'>//<![CDATA[
+function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+    var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+    if (r != null) return decodeURI(r[2]);
+    return null; //返回参数值
+}
+
+
+var factory = [[${companyForm.factory}]];
+var province = [[${companyForm.province}]];
+var sort = [[${companyForm.sort}]];
+var page = [[${companyForm.page}]];
+$("#form").submit(function () {
+    var dac = $("#factory").val();
+    var pro = $("#province").val();
+    var s = $("#sort").val();
+
+    if (factory !== dac || province !== pro ||
+        sort !== s ) {
+        $("#page").val(1);
+    }
+
+});
+function getString(s) {
+    if (s == null || s.length == 0) {
+        return ""
+    }
+    else {
+        return s;
+    }
+};
+factory = getString(factory);
+province = getString(province);
+nextPage = Number(page) + 1;
+prevPage = Number(page) - 1;
+
+
+$("#form").submit(function () {
+    var fac = $("#factory").val();
+
+    var prov = $("#province").val();
+
+    if (fac !== factory || prov !== province) {
+        $("#page").val(1);
+    }
+});
+
+var path = window.location.pathname;
+var requestParam = "?province="
+    + province + "&factory=" + factory + "&sort=" + sort + "&page=";
+//http://localhost:8889/com?factory=&province=&sort=1&page=1
+$(".content > td > a").each(function (index) {
+    $(this).attr("href", path + requestParam + $(this).attr("id"));
+});
+
+$("#next").attr("href", path + requestParam + nextPage);
+if (prevPage <= 0) {
+    prevPage = 1;
+}
+$("#prev").attr("href", path + requestParam + prevPage);
+//]]></script>
+
+</html>

@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Mar 27 21:00:46 CST 2019
+jsoup-1.10.3.jar>nexus-aliyun=
+jsoup-1.10.3.pom>central=
+jsoup-1.10.3.pom>nexus-aliyun=

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${queryWord} +'_搜索'">Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+    <style>
+        .wrapper {
+            margin-top: 70px;
+        }
+
+        .result {
+            padding-top: 10px;
+        }
+
+        .mainContent {
+            width: 60%;
+        }
+
+        .url {
+            color: green;
+        }
+
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+<div class="wrapper container">
+    <div class="form-group">
+        <form action="/search" method="get" class="form-inline">
+            <input class="form-control" type="text" name="queryWord" th:value="${queryWord}" style="width: 50%;"/>
+            <button class="form-control btn btn-primary" type="submit">库中搜索</button>
+            <br/>
+            <label>按照关键字权重<input class="form-control" type="radio" name="sort" value="keyWord"
+                                 th:checked="${sort} eq 'keyWord'"/></label>
+            <label>按照发布时间权重<input class="form-control" type="radio" name="sort" value="posttime"
+                                  th:checked="${sort} eq 'posttime'"/></label>
+
+        </form>
+    </div>
+
+    <div class="mainContent">
+        <div class="result" th:each="result : ${results}">
+            <div th:if="${!#strings.isEmpty(result.url) }">
+                <div><a th:href="${result.url}" target="_blank"><span th:utext="${result.title}">title</span></a></div>
+                <!--<div>发布时间：<span th:text="${#dates.format(result.postTime)}"></span></div>-->
+                <div><span th:text="${result.content}">content</span></div>
+                <div><a class="url" th:href="${result.url}" target="_blank"><span th:text="${result.url}">url</span></a>
+                </div>
+
+                <form action="/label" method="post" th:object="${lableVO}">
+                    <!--todo  这里需要根据后端返回的值判断一下，如果是已经打过的标签，则应该显示打好的标签-->
+                    <!--todo  这里也需要判断一下当前用户的身份，管理员角色才能看到打标签的内容，这一部分最后在做-->
+                    <div th:if="${result.isTagged == false}">
+                        <label>是伤害事件<input type="radio" th:field="*{isInjure}" name="isInjure" th:value="1"/></label>
+                        <label>不是伤害事件<input type="radio" th:field="*{isInjure}" name="isInjure" th:value="0"/></label>
+                        <label>是否重复<input type="checkbox" th:field="*{isDupli}" name="isDupli" th:value="1"/></label>
+                        <select th:field="*{otherLabel}">
+                            <option value="unlabel" selected="selected">无</option>
+                            <option value="label1">标签1</option>
+                            <option value="label2">标签2</option>
+                        </select>
+                    </div>
+                    <div th:if="${result.isTagged == true}">
+                        <label >是伤害事件<input type="radio" name="isInjure" th:value="1" th:checked="${result.labelInjure} eq 1"/></label>
+                        <label>不是伤害事件<input type="radio" name="isInjure" th:value="0" th:checked="${result.labelInjure} eq 0"/></label>
+                        <label>是否重复<input type="checkbox" name="isDupli" th:value="1"  th:checked="${result.labelDup} eq 1"/></label>
+                        <select name="otherLabel">
+                            <option value="unlabel" th:selected="${result.labelOther} eq 'unlabel'">无</option>
+                            <option value="label1" th:selected="${result.labelOther} eq 'label1'">标签1</option>
+                            <option value="label2" th:selected="${result.labelOther} eq 'label2'">标签2</option>
+                        </select>
+                    </div>
+                    <input type="hidden" th:value="${result.url}" name="url"/>
+                    <input type="hidden" th:value="${#httpServletRequest.getRequestURL() +'?'+ #httpServletRequest.getQueryString() }" name="pageUrl"/>
+                    <input type="submit"/>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="container paging">
+        <!--分页组件-->
+        <nav aria-label="Page navigation" th:object="${results}">
+            <ul class="pagination" th:if="${results.totalPages gt 7}">
+
+                <!--上一页-->
+                <li class="page-item" th:classappend="*{first} ? 'disabled' : ''">
+                    <a class="page-link"
+                       th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${results.number - 1}}}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">←</span>
+                    </a>
+                </li>
+                <!--首页-->
+                <li th:classappend="*{first} ? 'disabled' : ''">
+                    <a th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=0'} "
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- 当前页面小于等于4 -->
+                <li class="page-item" th:if="${(results.number + 1) le 4}" th:each="i : ${#numbers.sequence(1,6)}"
+                    th:classappend="${(results.number + 1) eq i} ? 'active' : ''">
+                    <a class="page-link" th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${i - 1}}}">
+                        <span th:text="${i}"></span>
+                    </a>
+                </li>
+                <li class="page-item disabled" th:if="${(results.number + 1) le 4}">
+                    <a href="javascript:void(0);" class="page-link">
+                        <span aria-hidden="true">...</span>
+                    </a>
+                </li>
+
+                <!-- 最后一页与当前页面之差，小于等于3 -->
+                <li class="page-item disabled" th:if="${(results.totalPages-(results.number + 1)) le 3}">
+                    <a href="javascript:void(0);" class="page-link">
+                        <span aria-hidden="true">...</span>
+                    </a>
+                </li>
+                <li class="page-item" th:if="${(results.totalPages-(results.number + 1)) le 3}"
+                    th:each="i : ${#numbers.sequence(results.totalPages-5, results.totalPages)}"
+                    th:classappend="${(results.number + 1) eq i} ? 'active' : ''">
+                    <a class="page-link" href="javascript:void(0);"
+                       th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${i - 1}}}">
+                        <span th:text="${i}"></span>
+                    </a>
+                </li>
+
+                <!--中间的页码(>4&&<last-1)-->
+                <li class="page-item disabled"
+                    th:if="${((results.number + 1) gt 4) and ((results.totalPages-(results.number + 1)) gt 3 )}">
+                    <a href="javascript:void(0);" class="page-link">
+                        <span aria-hidden="true">...</span>
+                    </a>
+                </li>
+                <!--中间一共5页-->
+                <li class="page-item"
+                    data-th-if="${((results.number + 1) gt 4) and ((results.totalPages-(results.number + 1)) gt 3 )}">
+                    <a class="page-link"
+                       th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${results.number - 2}}}"><span
+                            th:text="${results.number-1}"></span></a>
+                </li>
+                <li class="page-item"
+                    data-th-if="${((results.number + 1) gt 4) and ((results.totalPages-(results.number + 1)) gt 3 )}">
+                    <a class="page-link"
+                       th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${results.number-1}}}"><span
+                            th:text="${results.number}"></span></a>
+                </li>
+                <li class="page-item active"
+                    data-th-if="${((results.number + 1) gt 4) and ((results.totalPages-(results.number + 1)) gt 3 )}">
+                    <a class="page-link"
+                       th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${results.number}}}"><span
+                            th:text="${results.number+1}"></span></a>
+                </li>
+                <li class="page-item"
+                    data-th-if="${((results.number + 1) gt 4) and ((results.totalPages-(results.number + 1)) gt 3 )}">
+                    <a class="page-link"
+                       th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${results.number + 1}}}"><span
+                            th:text="${results.number+2}"></span></a>
+                </li>
+                <li class="page-item"
+                    data-th-if="${((results.number + 1) gt 4) and ((results.totalPages-(results.number + 1)) gt 3 )}">
+                    <a class="page-link"
+                       th:href="@{'/search?queryWord='+${queryWord}+'&amp;page=' + @{${results.number + 2}}}"><span
+                            th:text="${results.number+3}"></span></a>
+                </li>
+
+                <li class="page-item disabled"
+                    th:if="${((results.number + 1) gt 4) and ((results.totalPages-(results.number + 1)) gt 3 )}">
+                    <a href="javascript:void(0);" class="page-link">
+                        <span aria-hidden="true">...</span>
+                    </a>
+                </li>
+                <!--尾页-->
+                <li th:classappend="*{last} ? 'disabled' : ''">
+                    <a th:href="@{'/search?queryWord='+${queryWord}+'&amp;page='+${results.totalPages-1}} "
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <!--下一页-->
+                <li class="page-item" th:classappend="*{last} ? 'disabled' : ''">
+                    <a class="page-link"
+                       th:href="'/search?queryWord='+${queryWord}+'&amp;page=' + @{${results.number + 1}}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div th:replace="fragments/float-footer :: footer">...</div>
+</body>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script charset="uft-8" th:inline='javascript'>//<![CDATA[
+
+//]]></script>
+</html>

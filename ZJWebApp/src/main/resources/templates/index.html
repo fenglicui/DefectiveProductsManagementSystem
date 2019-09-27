@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+
+
+    <title>树蛙搜索</title>
+    <style>
+        .wrapper {
+            position: relative;
+            text-align: center;
+            width: 60%;
+            margin: 70px auto 0;
+            padding-bottom: 50px;
+        }
+        .logo {
+            margin-top: 180px;
+            margin-bottom: 40px;
+        }
+        .searchForm {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .secondary-wrapper {
+            position: relative;
+            width: 100%;
+            margin: 0 auto;
+            margin-top: 50px;
+        }
+        .no-border {
+            border: none;
+        }
+        .chart{
+            margin: auto;
+            width: 70%;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="wrapper">
+    <div class="logo"><img src="pic/logo.png" alt="江苏省标准化研究院" height="100px" width="300px"/></div>
+
+    <div class="searchForm">
+        <form action="/search" method="get" class="form-inline">
+            <input class="form-control" type="text" name="queryWord" style="width: 55%;font-size: 16px;"/>
+            <input class="form-control btn btn-primary" style="font-size: 16px;" type="submit" value="在库中搜索"/>
+        </form>
+    </div>
+    <div class="secondary-wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-2 col-md-offset-2"><a href="/injurecase"><div class="thumbnail no-border"><img src="pic/injure.png" style="height: 50px; width: 50px;" alt="伤害事件案例库" /><div class="caption"><span>伤害事件</span></div></div></a></div>
+                <div class="col-md-2"><a href="/productList"><div class="thumbnail no-border"><img src="pic/product.png" style="height: 50px; width: 50px;" alt="产品信息清单" /><div class="caption"><span>产品信息</span></div></div></a></div>
+                <div class="col-md-2"><a href="/com"><div class="thumbnail no-border"><img src="pic/enterprise.png" style="height: 50px; width: 50px;" alt="企业信息清单" /><div class="caption"><span>企业信息</span></div></div></a></div>
+                <div class="col-md-2"><a href="/hospital"><div class="thumbnail no-border"><img src="pic/hospital.png" style="height: 50px; width: 50px;" alt="医院数据入口" /><div class="caption"><span>医院数据</span></div></div></a></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="fragments/footer :: footer">...</div>
+</body>
+<!--<script th:src="@{/js/bootstrap.min.js}"></script>-->
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
+</html>

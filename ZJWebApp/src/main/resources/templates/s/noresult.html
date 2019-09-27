@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${queryWord} +'_搜索'">Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+    <style>
+        .wrapper {
+            margin-top: 70px;
+        }
+
+        .result {
+            padding-top: 10px;
+        }
+
+        .mainContent {
+            width: 60%;
+        }
+
+        .url {
+            color: green;
+        }
+        #noresult{
+            color: red;
+            font-size: larger;
+        }
+
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+<div class="wrapper container">
+    <div class="form-group">
+        <span id="noresult">未查找到相关记录！！</span>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer">...</div>
+</body>
+</html>

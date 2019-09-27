@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Mar 27 21:00:46 CST 2019
+antlr-2.7.7.pom>central=
+antlr-2.7.7.pom>nexus-aliyun=
+antlr-2.7.7.jar>nexus-aliyun=

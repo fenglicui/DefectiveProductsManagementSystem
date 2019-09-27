@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8"/>
+    <title >Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+
+</head>
+<body>
+<form action="/label" method="post" th:object="${lableVO}">
+    <label>是伤害事件<input type="radio" th:field="*{isInjure}" name="isInjure" th:value="1"/></label>
+    <label>不是伤害事件<input  type="radio" th:field="*{isInjure}" name="isInjure" th:value="0"/></label>
+    <label>是否重复<input  type="checkbox" th:field="*{isDupli}" name="isInjure" th:value="1"/></label>
+    <select th:field="*{otherLabel}">
+        <option value="unlabel" selected="selected">无</option>
+        <option value="label1">标签1</option>
+        <option value="label2">标签2</option>
+    </select>
+    <input type="submit"/>
+</form>
+</body>
+</html>

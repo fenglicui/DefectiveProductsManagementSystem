@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <title>医院数据检索库</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+    <style type="text/css">
+        .main {
+            width: 90%;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container main">
+    <h2 class="title" style="text-align: center">医院数据</h2>
+    <div><a href="/chart/hosChart" target="_blank"><button type="button" class="btn btn-primary">查看统计图表</button></a></div>
+    <form id="form" action="/hospital" method="get" class="form-horizontal" th:object="${hospitalDataForm}">
+        <div class="form-group">
+            <label for="productType" class="col-md-2" style="text-align: right; margin-top: 7px">产品关键字</label>
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="productType" id="productType"/>
+            </div>
+
+            <label for="injureDegree" class="col-md-2" style="text-align: right; margin-top: 7px">伤害程度</label>
+            <div class="col-md-2">
+                <select class="form-control" id="injureDegree" name="injureDegree"  >
+                    <option value=""    th:selected="${hospitalDataForm.injureDegree} == ''" >全部</option>
+                    <option value="轻度" th:selected="${hospitalDataForm.injureDegree} == '轻度'" >轻度</option>
+                    <option value="中度" th:selected="${hospitalDataForm.injureDegree} == '中度'" >中度</option>
+                    <option value="重度" th:selected="${hospitalDataForm.injureDegree} == '重度'" >重度</option>
+                </select>
+            </div>
+
+            <label for="datefrom" class="col-md-2" style="text-align: right; margin-top: 7px">起始日期</label>
+            <div class="col-md-2">
+                <input type="date" class="form-control" id="datefrom" name="datefrom" th:value="*{datefrom}"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="dateto" class="col-md-2" style="text-align: right; margin-top: 7px">截至日期</label>
+            <div class="col-md-2">
+                <input type="date" class="form-control" id="dateto" name="dateto" th:value="*{dateto}"/>
+            </div>
+
+            <label for="howgetInjure" class="col-md-2" style="text-align: right; margin-top: 7px">是否与产品相关</label>
+            <div class="col-md-2">
+                <select class="form-control" id="howgetInjure" name="howgetInjure" th:value="*{howgetInjure}">
+                    <option value="" th:selected="${hospitalDataForm.howgetInjure} == ''">全部</option>
+                    <option value="使用不当" th:selected="${hospitalDataForm.howgetInjure} == '使用不当'">使用不当</option>
+                    <option value="与产品质量有关" th:selected="${hospitalDataForm.howgetInjure} == '与产品质量有关'">与产品质量有关</option>
+                    <option value="像往常一样使用却突发事故" th:selected="${hospitalDataForm.howgetInjure} == '像往常一样使用却突发事故'">
+                        像往常一样使用却突发事故
+                    </option>
+                    <option value="不确定" th:selected="${hospitalDataForm.howgetInjure} == '不确定'">不确定</option>
+                    <option value="其他" th:selected="${hospitalDataForm.howgetInjure} == '其他'">其他</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-5 col-md-2">
+                <input class="btn btn-primary" type="submit" value="搜索"/>
+            </div>
+        </div>
+        <div th:inline="text">共检索到[[${{hos.totalElements}}]]条案例！</div>
+        <table class="table table-hover table-bordered table-striped">
+            <tr>
+                <th>姓名</th>
+                <th style="text-align: center" >性别</th>
+                <th style="text-align: center" >年龄</th>
+                <th style="text-align: center" >伤害发生时间</th>
+                <th style="text-align: center" >就诊时间</th>
+                <th>伤害发生原因</th>
+                <th>伤害涉及物品</th>
+                <th>伤害发生地点</th>
+                <th>伤害发生时活动</th>
+                <th>伤害部位</th>
+                <th>伤害临床诊断</th>
+                <th style="text-align: center" >伤害严重程度</th>
+                <th style="text-align: center" >伤害结局</th>
+                <th style="text-align: center" >是否饮酒</th>
+                <th style="text-align: center" >产品质量是否有关</th>
+            </tr>
+            <tr th:each="i : ${hos.content}">
+                <td th:text="${i.name}">1</td>
+                <td style="text-align: center" ><span th:if="${i.gender}==1" th:text="男"></span><span th:if="${i.gender}==2" th:text="女"></span>
+                </td>
+                <td style="text-align: center" th:text="${i.age}">1</td>
+                <td style="text-align: center" th:text="${#dates.format(i.injureDate, 'yyyy-MM-dd')}">1</td>
+                <td style="text-align: center" th:text="${#dates.format(i.visDate, 'yyyy-MM-dd')}">1</td>
+                <td th:text="${i.injureReason}">1</td>
+                <td th:text="${i.product}">1</td>
+                <td th:text="${i.injureLocation}">1</td>
+                <td th:text="${i.activityWhenInjure}">1</td>
+                <td th:text="${i.injureSite}">1</td>
+                <td th:text="${i.injurejudge}">1</td>
+                <td style="text-align: center" th:text="${i.injureDegree}">1</td>
+                <td style="text-align: center" th:text="${i.injureResult}">1</td>
+                <td style="text-align: center" th:text="${i.alcohol}">1</td>
+                <td style="text-align: center" th:text="${i.howGetInjure}">1</td>
+            </tr>
+        </table>
+        <div class="container paging">
+            <!--分页组件-->
+            <nav aria-label="Page navigation" th:object="${hos}">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <span>共<span th:text="${hos.totalPages}">1</span>页</span>
+                    </li>
+                    <!--当前页-->
+                    <li class="page-item disabled">
+                        <span th:inline="text">当前页码：[[${hos.number}+1]]</span>
+                    </li>
+                    <!--前往-->
+                    <li class="page-item">
+                        输入页码：<input type="text" id="page" name="page" th:value="${hospitalDataForm.page}"/>
+                        <input type="submit" value="前往"/>
+                    </li>
+                    <!--上一页-->
+                    <li class="page-item" th:classappend="${hos.isFirst()} ? 'disabled' : ''">
+                        <a id="prev" class="page-link" aria-label="Previous">
+                            <span aria-hidden="true">←</span>
+                        </a>
+                    </li>
+
+                    <!--下一页-->
+                    <li class="page-item" th:classappend="${hos.isLast()} ? 'disabled' : ''">
+                        <a id="next" class="page-link" aria-label="Next">
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </form>
+</div>
+
+<div th:replace="fragments/float-footer :: footer">...</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script charset="uft-8" th:inline='javascript'>//<![CDATA[
+function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+    var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+    if (r != null) return decodeURI(r[2]);
+    return null; //返回参数值
+}
+var datefrom = getUrlParam("datefrom");
+var dateto = getUrlParam("dateto");
+var productType = [[${hospitalDataForm.productType}]];
+var injureDegree = [[${hospitalDataForm.injureDegree}]];
+var howgetInjure = [[${hospitalDataForm.howgetInjure}]];
+var page = [[${hospitalDataForm.page}]];
+var dateFrom = [[${hospitalDataForm.datefrom}]];
+var dateTo = [[${hospitalDataForm.dateto}]];
+if (dateFrom != null) {
+    $("#datefrom").val(dateFrom.split("T")[0]);
+}
+if(dateTo !=null) {
+    $("#dateto").val(dateTo.split("T")[0]);
+}
+$("#form").submit(function () {
+    var productT = $("#productType").val();
+    var howgetI = $("#howgetInjure").val();
+    var injureD = $("#injureDegree").val();
+    var dateF = $("#dateFrom").val();
+    var dateT = $("#dateTo").val();
+    if (productType !== productT || howgetInjure !== howgetI ||
+        injureDegree !== injureD ||
+        dateF !== datefrom || dateT !== dateto) {
+        $("#page").val(1);
+    }
+
+});
+nextPage = Number(page) + 1;
+prevPage =Number(page) - 1
+if (productType == null || productType.length == 0) {
+    productType = "";
+}
+if (injureDegree == null || injureDegree.length == 0) {
+    injureDegree = "";
+}
+if (howgetInjure == null || howgetInjure.length == 0) {
+    howgetInjure = "";
+}
+$("#productType").val(productType)
+var path = window.location.pathname;
+var requestParam = "?injureDegree=" + injureDegree + "&productType="
+    + productType + "&howgetInjure=" + howgetInjure + "&datefrom="
+    + datefrom + "&dateto=" + dateto + "&page="
+
+$("#next").attr("href",path+requestParam+nextPage);
+if(prevPage <=0){
+    prevPage = 1;
+}
+$("#prev").attr("href",path+requestParam+prevPage);
+//]]></script>
+
+</html>

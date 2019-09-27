@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+
+
+    <title>系统状态</title>
+    <style>
+
+        .wrapper {
+            position: relative;
+            text-align: center;
+            width: 1000px;
+            margin: 70px auto 0;
+            padding-bottom: 50px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .container {
+            text-align: center;
+            width: 80%;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="wrapper">
+    <table class="table table-bordered">
+        <tr>
+            <th style="text-align: center;">系统参数</th>
+            <th style="text-align: center;">详情</th>
+        </tr>
+        <tr>
+            <td>系统运行时长</td>
+            <td>
+                1天
+            </td>
+        </tr>
+        <tr>
+            <td>数据量总大小</td>
+            <td>
+                49.8G
+            </td>
+        </tr>
+        <tr>
+            <td>URL seeds数量</td>
+            <td>
+                47
+            </td>
+        </tr>
+        <tr>
+            <td>文件总数</td>
+            <td>
+                139
+            </td>
+        </tr>
+        <tr>
+            <td>数据分布</td>
+            <td style="text-align: center;">
+                <div id="main1" style="width: 450px;height:450px; display: block; margin: 0 auto;"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>新增数据分布</td>
+            <td style="text-align: center;">
+                <div id="main2" style="width: 450px;height:450px; display: block; margin: 0 auto;"></div>
+            </td>
+        </tr>
+    </table>
+
+</div>
+<div th:replace="fragments/float-footer :: footer">...</div>
+</body>
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+<script src='http://echarts.baidu.com/build/dist/echarts-all.js'></script>
+<script type="text/javascript">
+    $("#system-states").addClass("active");
+    $("#system-states").siblings().removeClass("active");
+</script>
+<script type="text/javascript" th:inline="javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart1 = echarts.init(document.getElementById('main1'));
+    // 指定图表的配置项和数据
+    var option1 = {
+
+        title: {
+            text: '当前数据量，共' + [[${total[0]}]] + '(更新于' + [[${#dates.format(date, 'yyyy-MM-dd')}]] + ')',
+            x: 'center'
+
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+
+        // legend: {
+        //     orient : 'vertical',
+        //     x : 'left',
+        //     data:['政府网站','新闻网站','社交平台','其他']
+        // },
+        // toolbox: {
+        //     show : false,
+        //     feature : {
+        //         mark : {show: true},
+        //         dataView : {show: true, readOnly: false},
+        //         magicType : {
+        //             show: true,
+        //             type: ['pie', 'funnel'],
+        //             option: {
+        //                 funnel: {
+        //                     x: '25%',
+        //                     width: '50%',
+        //                     funnelAlign: 'left',
+        //                     max: 1548
+        //                 }
+        //             }
+        //         },
+        //         restore : {show: true},
+        //         saveAsImage : {show: true}
+        //     }
+        // },
+        calculable: true,
+        series: [
+            {
+                name: '数据来源',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '50%'],
+                data: [
+                    {value: [[${total[1]}]], name: '政府网站'},
+                    {value: [[${total[2]}]], name: '新闻网站'},
+                    {value: [[${total[3]}]], name: '社交平台'},
+                    {value: [[${total[4]}]], name: '其他'},
+                ]
+            }
+        ]
+    };
+    myChart1.setOption(option1);
+
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart2 = echarts.init(document.getElementById('main2'));
+    // 指定图表的配置项和数据
+    var option2 = {
+
+        title: {
+            text: '新增数据,共' + [[${last[0]}]],
+            x: 'center',
+
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        // legend: {
+        //     orient : 'vertical',
+        //     x : 'right',
+        //     data:['政府网站','新闻网站','社交平台','其他']
+        // },
+//
+//        visualMap: {
+//            show: false,
+//            min: 80,
+//            max: 600,
+//            inRange: {
+//                colorLightness: [0, 1]
+//            }
+//        },
+        series: [
+            {
+                name: '数据来源',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '50%'],
+                data: [
+                    {value: [[${last[1]}]], name: '政府网站'},
+                    {value: [[${last[2]}]], name: '新闻网站'},
+                    {value: [[${last[3]}]], name: '社交平台'},
+                    {value: [[${last[4]}]], name: '其他'},
+                ]
+            }
+        ]
+    };
+    myChart2.setOption(option2);
+</script>
+</html>

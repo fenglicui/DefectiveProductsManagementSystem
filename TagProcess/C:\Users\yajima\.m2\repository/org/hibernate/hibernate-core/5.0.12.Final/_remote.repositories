@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Mar 27 21:00:46 CST 2019
+hibernate-core-5.0.12.Final.pom>central=
+hibernate-core-5.0.12.Final.pom>nexus-aliyun=
+hibernate-core-5.0.12.Final.jar>nexus-aliyun=
