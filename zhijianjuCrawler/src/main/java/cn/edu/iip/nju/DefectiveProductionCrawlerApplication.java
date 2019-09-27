@@ -2,12 +2,8 @@ package cn.edu.iip.nju;
 
 import cn.edu.iip.nju.crawler.*;
 import cn.edu.iip.nju.crawler.fujian.ExcelProcess;
-import cn.edu.iip.nju.dao.NewsDataDao;
-import cn.edu.iip.nju.model.NewsData;
 import cn.edu.iip.nju.service.NewsDataService;
 import cn.edu.iip.nju.service.RedisService;
-import cn.edu.iip.nju.util.ReadFileUtil;
-import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +11,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 @SpringBootApplication
-public class ZhijianjuCrawlerApplication implements CommandLineRunner {
-    private static Logger logger = LoggerFactory.getLogger(ZhijianjuCrawlerApplication.class);
+public class DefectiveProductionCrawlerApplication implements CommandLineRunner {
+    private static Logger logger = LoggerFactory.getLogger(DefectiveProductionCrawlerApplication.class);
     @Autowired
     ExecutorService pool;
     //京东
@@ -48,8 +39,6 @@ public class ZhijianjuCrawlerApplication implements CommandLineRunner {
     BJXFZXH bjxfzxh;
     @Autowired
     LNXFZXH lnxfzxh;
-    //11111111111111111111111111
-
 
     @Autowired
     Zhiliangxinwenwang zhiliangxinwenwang;
@@ -70,6 +59,7 @@ public class ZhijianjuCrawlerApplication implements CommandLineRunner {
 
     @Autowired
     Chinanews chinanews;
+
     @Autowired
     Fenghuang fenghuang;
 
@@ -90,14 +80,11 @@ public class ZhijianjuCrawlerApplication implements CommandLineRunner {
 //    CPZLJDS cpzljds;//问题很大，网页变了，而且附件也没了
     @Override
     public void run(String... strings) throws Exception {
-        newsCrawler.startBaiduNewsCrawler();
+        newsCrawler.saveNewsFromBaidu();
         logger.info("finish");
     }
 
-
-
-
     public static void main(String[] args) {
-        SpringApplication.run(ZhijianjuCrawlerApplication.class, args);
+        SpringApplication.run(DefectiveProductionCrawlerApplication.class, args);
     }
 }
